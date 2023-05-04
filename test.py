@@ -81,7 +81,7 @@ for i in range(len(code_lines)):
                     print("")
                 if instr_name == "STR":
                     func_str(operand1, operand2)
-                    print("STR : " + operand1 + " ← " + operand1 + " + " + operand2)
+                    print("STR : " + operand1 + " ← " + operand2)
                     print(data_vars)
                     print("")
 
