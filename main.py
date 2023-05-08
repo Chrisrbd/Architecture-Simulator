@@ -1,4 +1,3 @@
-
 def func_lda(reg, y):
     print("LDA:", reg, "<--", y)
     if reg in list(variables)[0:3]:
@@ -177,7 +176,7 @@ with open("asm-examples/" + filename, "r") as file:
             elif is_code_section:
                 code_lines.append(line.strip())
 
-variables = {"T0": 0, "T1": 0, "T2": 0, "T3": 0, "Stack": stack[SP]} # Stack is the last element in the Stack
+variables = {"T0": 0, "T1": 0, "T2": 0, "T3": 0, "Stack": stack[SP]}  # Stack is the last element in the Stack
 
 # Execute #DATA section
 print("\n#DATA section translated:")
@@ -246,4 +245,3 @@ for key in variables:
         variables[key] = binary_value
 
 print(variables)
-

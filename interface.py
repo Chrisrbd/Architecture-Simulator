@@ -1,50 +1,33 @@
 import tkinter as tk
 
-
-class App:
-    def __init__(self, master):
-        self.master = master
-        master.title("Hello World")
-
-        self.alphabet = ['A 10', 'B 15', 'RES 0']
-        self.index = 0
-
-        self.button = tk.Button(master, text="Next", command=self.next_element)
-        self.button.pack()
-
-        self.t0_value = 0
-        self.t1_value = 0
-        self.t2_value = 0
-        self.t3_value = 0
-
-        self.label = tk.Label(master, text="Registers :")
-        self.label.pack()
-        self.t0_label = tk.Label(master, text="T0 = " + str(self.t0_value))
-        self.t0_label.pack()
-        self.t1_label = tk.Label(master, text="T1 = " + str(self.t1_value))
-        self.t1_label.pack()
-        self.t2_label = tk.Label(master, text="T2 = " + str(self.t2_value))
-        self.t2_label.pack()
-        self.t3_label = tk.Label(master, text="T3 = " + str(self.t3_value))
-        self.t3_label.pack()
-
-        self.label = tk.Label(master, text="Variables :")
-        self.label.pack()
-
-        self.frame = tk.Frame(master)
-        self.frame.pack()
-
-    def next_element(self):
-        if self.index < len(self.alphabet):
-            element = self.alphabet[self.index].split()
-            label_text = element[0] + " = " + element[1]
-            tk.Label(self.frame, text=label_text).pack()
-            self.index += 1
-
-        self.t0_value += 1
-        self.t0_label.configure(text="T0 = " + str(self.t0_value))
+# Exemple de listes de données et de code
+dataline = ["a", "b", "c"]
+codeline = ["x", "y", "z"]
 
 
+# Fonction pour parcourir les listes et afficher les variables et leurs valeurs
+def next_button():
+    global dataline_index, codeline_index
+    if dataline_index < len(dataline):
+        var_label.config(text=f"{dataline[dataline_index]} = {eval(codeline[codeline_index])}")
+        dataline_index += 1
+        codeline_index += 1
+
+
+# Création de la fenêtre principale
 root = tk.Tk()
-app = App(root)
+
+# Ajout du label pour afficher les variables et leurs valeurs
+var_label = tk.Label(root, text="", font=("Arial", 14))
+var_label.pack()
+
+# Ajout du bouton "Next"
+next_button = tk.Button(root, text="Next", command=next_button)
+next_button.pack()
+
+# Initialisation des index pour parcourir les listes
+dataline_index = 0
+codeline_index = 0
+
+# Démarrage de la boucle principale de l'interface graphique
 root.mainloop()

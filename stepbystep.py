@@ -209,8 +209,6 @@ class App:
     def __init__(self, master):
         self.master = master
         master.title("Hello World")
-
-        self.alphabet = ['A 10', 'B 15', 'RES 0']
         self.index = 0
 
         self.button = tk.Button(master, text="Next", command=self.next_element)
@@ -239,13 +237,16 @@ class App:
         self.frame.pack()
 
     def next_element(self):
-        if self.index < len(self.alphabet):
-            element = self.alphabet[self.index].split()
+        if self.index < len(data_lines):
+            element = data_lines[self.index].split()
             label_text = element[0] + " = " + element[1]
             tk.Label(self.frame, text=label_text).pack()
             self.index += 1
 
 
 root = tk.Tk()
+root.geometry("400x400")
 app = App(root)
 root.mainloop()
+
+
