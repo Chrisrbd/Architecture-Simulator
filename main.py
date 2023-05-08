@@ -47,36 +47,74 @@ def func_pop(var):
         print("POP:", var, " <-- stack")
     else:
         print("Error: Storing in a memory region is NOT ALLOWED.")
+    
+
+   
+
 
 
 def func_and(reg1, reg2):
     print("AND:", reg1, "=", reg1, "and", reg2)
-    variables[reg1] = variables[reg1] and variables[reg2]
+    if reg1 in list(variables)[0:3]:
+     
+        if reg2 in variables:
+            variables[reg1] = variables[reg1] and variables[reg2]
+        elif is_int(reg2):
+            variables[reg1] = variables[reg1] and int(reg2)
+        else:
+            print(f"Error: {reg2} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
+
+def is_int(val):
+    try:
+        int(val)
+        return True
+    except ValueError:
+        return False
 
 
 def func_or(reg1, reg2):
     print("OR:", reg1, "=", reg1, "or", reg2)
-    variables[reg1] = variables[reg1] or variables[reg2]
+    if reg1 in list(variables)[0:3]:
+        if reg2 in variables:
+            variables[reg1] = variables[reg1] or variables[reg2]
+        elif is_int(reg2):
+            variables[reg1] = variables[reg1] or int(reg2)
+        else:
+            print(f"Error: {reg2} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_not(reg):
     print("NOT:", reg, "= not", reg)
-    variables[reg] = not variables[reg]
+    if reg in list(variables)[0:3]:
+        variables[reg] = not variables[reg]
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_add(x, y):
-    print("ADD: ", x, "=", x, "+", y)
-    variables[x] += variables[y]
-
+def func_add(reg1, reg2):
+    if reg2 in list(variables)[0:3]:
+        print("ADD:", reg1, "=", reg1, "+", reg2)
+        variables[reg1] += variables[reg2]
+    else:
+        print("ADD:", reg1, "=", reg1, "+", reg2)
+        variables[reg1] += reg2
 
 def func_sub(reg1, reg2):
-    print("SUB:", reg1, "=", reg1, "-", reg2)
-    variables[reg1] -= variables[reg2]
+    print("SUB:", reg1, "=", reg2, "-", reg1)
+    variables[reg1] = variables[reg2] - variables[reg1]
+
 
 
 def func_div(reg1, reg2):
     print("DIV:", reg1, "=", reg1, "/", reg2)
-    variables[reg1] /= variables[reg2]
+    if variables[reg2] == 0:
+        print("Error: Division by zero")
+    else:
+        variables[reg1] //= variables[reg2]
 
 
 def func_mul(reg1, reg2):
@@ -85,28 +123,46 @@ def func_mul(reg1, reg2):
 
 
 def func_mod(reg1, reg2):
+    if variables[reg2] == 0:
+        raise ZeroDivisionError("Modulo by zero")
     print("MOD:", reg1, "=", reg1, "%", reg2)
-    variables[reg1] %= variables[reg2]
+    variables[reg1] = variables[reg1] % variables[reg2]
+
 
 
 def func_inc(reg):
-    print("INC:", reg, "=", reg, "+ 1")
-    variables[reg] += 1
+    if reg in list(variables)[0:3]:
+     print("INC:", reg, "=", reg, "+ 1")
+     variables[reg] += 1
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)") 
 
 
 def func_dec(reg):
-    print("DEC:", reg, "=", reg, "- 1")
-    variables[reg] -= 1
+    if variables[reg] == 0:
+        raise ValueError("Cannot decrement register that already contains zero")
+    else:
+        print("DEC:", reg, "=", reg, "- 1")
+        variables[reg] -= 1
 
 
 def func_beq(reg1, reg2, address):
-    if variables[reg1] == variables[reg2]:
+    if isinstance(reg2, int):
+        if reg2 not in variables:
+            raise ValueError(f"Memory address {reg2} does not exist")
+        val2 = variables[reg2]
+    else:
+        val2 = variables[reg2]
+    if variables[reg1] == val2:
         func_jmp(address)
 
 
 def func_bne(reg1, reg2, address):
     if variables[reg1] != variables[reg2]:
-        func_jmp(address)
+        if address in labels:
+            func_jmp(address)
+        else:
+            raise Exception("Label not found: " + address)
 
 
 def func_bgg(reg1, reg2, address):
