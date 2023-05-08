@@ -47,42 +47,30 @@ def func_pop(var):
         print("POP:", var, " <-- stack")
     else:
         print("Error: Storing in a memory region is NOT ALLOWED.")
-    
-
-   
 
 
-
-def func_and(reg1, reg2):
-    print("AND:", reg1, "=", reg1, "and", reg2)
+def func_and(reg1, var):
+    print("AND:", reg1, "=", reg1, "and", var)
     if reg1 in list(variables)[0:3]:
-     
-        if reg2 in variables:
-            variables[reg1] = variables[reg1] and variables[reg2]
-        elif is_int(reg2):
-            variables[reg1] = variables[reg1] and int(reg2)
+        if var in variables:
+            variables[reg1] = variables[reg1] and variables[var]
+        elif var.isdigit():
+            variables[reg1] = variables[reg1] and int(var)
         else:
-            print(f"Error: {reg2} is not a valid register, variable, or constant")
+            print(f"Error: {var} is not a valid register, variable, or constant")
     else:
         print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
-def is_int(val):
-    try:
-        int(val)
-        return True
-    except ValueError:
-        return False
 
-
-def func_or(reg1, reg2):
-    print("OR:", reg1, "=", reg1, "or", reg2)
+def func_or(reg1, var):
+    print("OR:", reg1, "=", reg1, "or", var)
     if reg1 in list(variables)[0:3]:
-        if reg2 in variables:
-            variables[reg1] = variables[reg1] or variables[reg2]
-        elif is_int(reg2):
-            variables[reg1] = variables[reg1] or int(reg2)
+        if var in variables:
+            variables[reg1] = variables[reg1] or variables[var]
+        elif var.isdigit():
+            variables[reg1] = variables[reg1] or int(var)
         else:
-            print(f"Error: {reg2} is not a valid register, variable, or constant")
+            print(f"Error: {var} is not a valid register, variable, or constant")
     else:
         print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
@@ -95,84 +83,153 @@ def func_not(reg):
         print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_add(reg1, reg2):
-    if reg2 in list(variables)[0:3]:
-        print("ADD:", reg1, "=", reg1, "+", reg2)
-        variables[reg1] += variables[reg2]
+def func_add(reg, var):
+    print("ADD:", reg, "=", reg, "+", var)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] += variables[var]
+        elif var.isdigit():
+            variables[reg] += int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
     else:
-        print("ADD:", reg1, "=", reg1, "+", reg2)
-        variables[reg1] += reg2
-
-def func_sub(reg1, reg2):
-    print("SUB:", reg1, "=", reg2, "-", reg1)
-    variables[reg1] = variables[reg2] - variables[reg1]
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-
-def func_div(reg1, reg2):
-    print("DIV:", reg1, "=", reg1, "/", reg2)
-    if variables[reg2] == 0:
-        print("Error: Division by zero")
+def func_sub(reg, var):
+    print("SUB:", reg, "=", var, "-", reg)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] = variables[var] - variables[reg]
+        elif var.isdigit():
+            variables[reg] = int(var) - variables[reg]
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
     else:
-        variables[reg1] //= variables[reg2]
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_mul(reg1, reg2):
-    print("MUL:", reg1, "=", reg1, "*", reg2)
-    variables[reg1] *= variables[reg2]
+def func_div(reg, var):
+    print("DIV:", reg, "=", reg, "/", var)
+    if reg in list(variables)[0:3]:
+        if var == 0:
+            print("Error: Division by zero")
+        elif var in variables:
+            variables[reg] //= variables[var]
+        elif var.isdigit():
+            variables[reg] //= int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_mod(reg1, reg2):
-    if variables[reg2] == 0:
+def func_mul(reg, var):
+    print("MUL:", reg, "=", reg, "*", var)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] *= variables[var]
+        elif var.isdigit():
+            variables[reg] *= int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
+
+
+def func_mod(reg, var):
+    if variables[var] == 0:
         raise ZeroDivisionError("Modulo by zero")
-    print("MOD:", reg1, "=", reg1, "%", reg2)
-    variables[reg1] = variables[reg1] % variables[reg2]
-
+    print("MOD:", reg, "=", reg, "%", var)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] = variables[reg] % variables[var]
+        elif var.isdigit():
+            variables[reg] = variables[reg] % int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_inc(reg):
+    print("INC:", reg, "=", reg, "+ 1")
     if reg in list(variables)[0:3]:
-     print("INC:", reg, "=", reg, "+ 1")
-     variables[reg] += 1
+        variables[reg] += 1
     else:
-        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)") 
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_dec(reg):
-    if variables[reg] == 0:
-        raise ValueError("Cannot decrement register that already contains zero")
+    print("DEC:", reg, "=", reg, "- 1")
+    if reg in list(variables)[0:3]:
+        if variables[reg] == 0:
+            raise ValueError("Cannot decrement register that already contains zero")
+        else:
+            variables[reg] -= 1
     else:
-        print("DEC:", reg, "=", reg, "- 1")
-        variables[reg] -= 1
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_beq(reg1, reg2, address):
-    if isinstance(reg2, int):
-        if reg2 not in variables:
-            raise ValueError(f"Memory address {reg2} does not exist")
-        val2 = variables[reg2]
+    if reg1 & reg2 in variables:
+        if variables[reg1] == variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] == reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 == variables[reg2]:
+            func_jmp(address)
     else:
-        val2 = variables[reg2]
-    if variables[reg1] == val2:
-        func_jmp(address)
+        if reg1 == reg2:
+            func_jmp(address)
 
 
 def func_bne(reg1, reg2, address):
-    if variables[reg1] != variables[reg2]:
-        if address in labels:
+    if reg1 & reg2 in variables:
+        if variables[reg1] != variables[reg2]:
             func_jmp(address)
-        else:
-            raise Exception("Label not found: " + address)
+    elif reg1 in variables:
+        if variables[reg1] != reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 != variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 != reg2:
+            func_jmp(address)
+
 
 
 def func_bgg(reg1, reg2, address):
-    if variables[reg1] > variables[reg2]:
-        func_jmp(address)
+    if reg1 & reg2 in variables:
+        if variables[reg1] > variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] > reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 > variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 > reg2:
+            func_jmp(address)
 
 
 def func_bsm(reg1, reg2, address):
-    if variables[reg1] < variables[reg2]:
-        func_jmp(address)
+    if reg1 & reg2 in variables:
+        if variables[reg1] < variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] < reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 < variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 < reg2:
+            func_jmp(address)
 
 
 def func_jmp(address):
