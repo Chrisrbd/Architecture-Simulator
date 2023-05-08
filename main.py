@@ -1,21 +1,24 @@
 
-def func_lda(x, y):
-    print("LDA:", x, "<--", y)
-    if y.isdigit():
-        # If y is a number
-        variables[x] = int(y)
-    elif y in variables:
-        # If y is a variable
-        variables[x] = variables[y]
+def func_lda(reg, y):
+    print("LDA:", reg, "<--", y)
+    if reg in list(variables.values())[0:3]:
+        if y.isdigit():
+            # If y is a number
+            variables[reg] = int(y)
+        elif y in variables:
+            # If y is a variable
+            variables[reg] = variables[y]
+        else:
+            raise ValueError(y, " must be an integer")
     else:
-        raise ValueError(y, " must be an integer")
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_str(x, y):
     print("STR:", x, "<--", y)
     if x in list(variables.values())[0:3]:
         # If y is a register
-        print("Error: Register stores are not allowed.")
+        print("Error: Register stores are NOT ALLOWED.")
     if y.isdigit():
         # If y is a number
         variables[x] = int(y)
@@ -24,9 +27,27 @@ def func_str(x, y):
         variables[x] = variables[y]
 
 
-def func_push(reg, var):
-    print("PUSH:", reg, "<--", var)
-    variables[reg] = variables[var]
+def func_push(var):
+    print("PUSH: stack <--", var)
+    global SP, stack
+    if var.isdigit():
+        # If y is a number
+        stack[SP] = int(var)
+    else:
+        # If y is a variable
+        stack[SP] = variables[var]
+    SP += 1
+
+
+def func_pop(var):
+    global SP, stack
+    if var in list(variables.values())[0:3]:
+        # If y is a register
+        SP -= 1
+        variables[var] = stack[SP]
+        print("POP:", var, " <-- stack")
+    else:
+        print("Error: Storing in a memory region is NOT ALLOWED.")
 
 
 def func_and(reg1, reg2):
@@ -45,9 +66,8 @@ def func_not(reg):
 
 
 def func_add(x, y):
-    print("ADD: ", x, " = ", x, " + ", y)
+    print("ADD: ", x, "=", x, "+", y)
     variables[x] += variables[y]
-
 
 
 def func_sub(reg1, reg2):
@@ -106,14 +126,19 @@ def func_jmp(address):
 
 
 def func_hlt():
-    print("HLT: end the program execution!\n")
+    print("HLT: end the program execution!")
     # stop execution
     pass
 
 
 filename = "example1.asm"
+# 2 shared memories, one to store the data and another to store the code
 data_lines = []
 code_lines = []
+
+# Creation of the stack + stack pointer to follow the current position in the stack
+stack = [0] * 4096
+SP = 0  # Stack pointer initialized to 0
 
 # Store from the .asm file the #DATA section lines and #CODE section lines in different tabs
 with open("asm-examples/" + filename, "r") as file:
@@ -142,8 +167,7 @@ with open("asm-examples/" + filename, "r") as file:
             elif is_code_section:
                 code_lines.append(line.strip())
 
-
-variables = {"T0": 0, "T1": 0, "T2": 0, "T3": 0}
+variables = {"T0": 0, "T1": 0, "T2": 0, "T3": 0, "Stack": stack[SP]} # Stack is the last element in the Stack
 
 # Execute #DATA section
 print("\n#DATA section translated:")
@@ -167,6 +191,7 @@ def execute_instruction(instruction, arguments):
         "LDA": func_lda,
         "STR": func_str,
         "PUSH": func_push,
+        "POP": func_pop,
         "AND": func_and,
         "OR": func_or,
         "NOT": func_not,
@@ -200,7 +225,6 @@ for line in code_lines:
     args = parts[1:]
     # Execute the instruction with its arguments
     execute_instruction(instruction, args)
-
-print(variables)
+    print(variables)
 
 
