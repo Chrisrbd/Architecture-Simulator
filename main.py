@@ -1,7 +1,7 @@
 
 def func_lda(reg, y):
     print("LDA:", reg, "<--", y)
-    if reg in list(variables.values())[0:3]:
+    if reg in list(variables)[0:3]:
         if y.isdigit():
             # If y is a number
             variables[reg] = int(y)
@@ -14,17 +14,17 @@ def func_lda(reg, y):
         print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_str(x, y):
-    print("STR:", x, "<--", y)
-    if x in list(variables.values())[0:3]:
+def func_str(var, y):
+    print("STR:", var, "<--", y)
+    if var in list(variables)[0:3]:
         # If y is a register
         print("Error: Register stores are NOT ALLOWED.")
     if y.isdigit():
         # If y is a number
-        variables[x] = int(y)
+        variables[var] = int(y)
     else:
         # If y is a variable
-        variables[x] = variables[y]
+        variables[var] = variables[y]
 
 
 def func_push(var):
@@ -41,7 +41,7 @@ def func_push(var):
 
 def func_pop(var):
     global SP, stack
-    if var in list(variables.values())[0:3]:
+    if var in list(variables)[0:3]:
         # If y is a register
         SP -= 1
         variables[var] = stack[SP]
@@ -131,6 +131,16 @@ def func_hlt():
     pass
 
 
+def func_srl(reg, const):
+    print("SRL:", reg, "=", reg, ">>", const)
+    variables[reg] = variables[reg] // (2 ** int(const))
+
+
+def func_srr(reg, const):
+    print("SRR:", reg, "=", reg, "<<", const)
+    variables[reg] = variables[reg] * (2 ** int(const))
+
+
 filename = "example1.asm"
 # 2 shared memories, one to store the data and another to store the code
 data_lines = []
@@ -207,7 +217,9 @@ def execute_instruction(instruction, arguments):
         "BBG": func_bgg,
         "BSM": func_bsm,
         "JMP": func_jmp,
-        "HLT": func_hlt
+        "HLT": func_hlt,
+        "SRL": func_srl,
+        "SRR": func_srr
     }
     # Get the function from the switcher dictionary
     func = instructions.get(instruction)
@@ -216,7 +228,7 @@ def execute_instruction(instruction, arguments):
 
 
 print("\n#CODE section result:")
-print(code_lines,"\n")
+print(code_lines, "\n")
 # Execute #CODE section
 for line in code_lines:
     # Separate the instruction from its arguments
@@ -225,6 +237,13 @@ for line in code_lines:
     args = parts[1:]
     # Execute the instruction with its arguments
     execute_instruction(instruction, args)
-    print(variables)
 
+# Conversion of registers to bin
+for key in variables:
+    if key.startswith("T"):
+        decimal_value = variables[key]
+        binary_value = bin(decimal_value)[2:]  # Convert to binary and remove the "0b" prefix
+        variables[key] = binary_value
+
+print(variables)
 
