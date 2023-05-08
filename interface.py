@@ -269,6 +269,6 @@ class App:
 
 
 root = tk.Tk()
-root.geometry("400x400")
+root.geometry("3000x3000")
 app = App(root)
 root.mainloop()
