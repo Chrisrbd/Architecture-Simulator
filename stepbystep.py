@@ -1,7 +1,5 @@
 import tkinter as tk
 
-import app as app
-
 
 def func_lda(x, y):
     print("LDA:", x, "<--", y)
