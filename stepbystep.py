@@ -1,106 +1,237 @@
 import tkinter as tk
 
-import app as app
-
-
-def func_lda(x, y):
-    print("LDA:", x, "<--", y)
-    if y.isdigit():
-        # If y is a number
-        variables[x] = int(y)
-    elif y in variables:
-        # If y is a variable
-        variables[x] = variables[y]
+def func_lda(reg, y):
+    print("LDA:", reg, "<--", y)
+    if reg in list(variables)[0:3]:
+        if y.isdigit():
+            # If y is a number
+            variables[reg] = int(y)
+        elif y in variables:
+            # If y is a variable
+            variables[reg] = variables[y]
+        else:
+            raise ValueError(y, " must be an integer")
     else:
-        raise ValueError(y, " must be an integer")
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_str(x, y):
-    print("STR:", x, "<--", y)
-    if x in list(variables.values())[0:3]:
+def func_str(var, y):
+    print("STR:", var, "<--", y)
+    if var in list(variables)[0:3]:
         # If y is a register
-        print("Error: Register stores are not allowed.")
+        print("Error: Register stores are NOT ALLOWED.")
     if y.isdigit():
         # If y is a number
-        variables[x] = int(y)
+        variables[var] = int(y)
     else:
         # If y is a variable
-        variables[x] = variables[y]
+        variables[var] = variables[y]
 
 
-def func_push(reg, var):
-    print("PUSH:", reg, "<--", var)
-    variables[reg] = variables[var]
+def func_push(var):
+    print("PUSH: stack <--", var)
+    global SP, stack
+    if var.isdigit():
+        # If y is a number
+        stack[SP] = int(var)
+    else:
+        # If y is a variable
+        stack[SP] = variables[var]
+    SP += 1
 
 
-def func_and(reg1, reg2):
-    print("AND:", reg1, "=", reg1, "and", reg2)
-    variables[reg1] = variables[reg1] and variables[reg2]
+def func_pop(var):
+    global SP, stack
+    if var in list(variables)[0:3]:
+        # If y is a register
+        SP -= 1
+        variables[var] = stack[SP]
+        print("POP:", var, " <-- stack")
+    else:
+        print("Error: Storing in a memory region is NOT ALLOWED.")
 
 
-def func_or(reg1, reg2):
-    print("OR:", reg1, "=", reg1, "or", reg2)
-    variables[reg1] = variables[reg1] or variables[reg2]
+def func_and(reg1, var):
+    print("AND:", reg1, "=", reg1, "and", var)
+    if reg1 in list(variables)[0:3]:
+        if var in variables:
+            variables[reg1] = variables[reg1] and variables[var]
+        elif var.isdigit():
+            variables[reg1] = variables[reg1] and int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
+
+
+def func_or(reg1, var):
+    print("OR:", reg1, "=", reg1, "or", var)
+    if reg1 in list(variables)[0:3]:
+        if var in variables:
+            variables[reg1] = variables[reg1] or variables[var]
+        elif var.isdigit():
+            variables[reg1] = variables[reg1] or int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_not(reg):
     print("NOT:", reg, "= not", reg)
-    variables[reg] = not variables[reg]
+    if reg in list(variables)[0:3]:
+        variables[reg] = not variables[reg]
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_add(x, y):
-    print("ADD: ", x, " = ", x, " + ", y)
-    variables[x] += variables[y]
+def func_add(reg, var):
+    print("ADD:", reg, "=", reg, "+", var)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] += variables[var]
+        elif var.isdigit():
+            variables[reg] += int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_sub(reg1, reg2):
-    print("SUB:", reg1, "=", reg1, "-", reg2)
-    variables[reg1] -= variables[reg2]
+def func_sub(reg, var):
+    print("SUB:", reg, "=", var, "-", reg)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] = variables[var] - variables[reg]
+        elif var.isdigit():
+            variables[reg] = int(var) - variables[reg]
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_div(reg1, reg2):
-    print("DIV:", reg1, "=", reg1, "/", reg2)
-    variables[reg1] /= variables[reg2]
+def func_div(reg, var):
+    print("DIV:", reg, "=", reg, "/", var)
+    if reg in list(variables)[0:3]:
+        if var == 0:
+            print("Error: Division by zero")
+        elif var in variables:
+            variables[reg] //= variables[var]
+        elif var.isdigit():
+            variables[reg] //= int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_mul(reg1, reg2):
-    print("MUL:", reg1, "=", reg1, "*", reg2)
-    variables[reg1] *= variables[reg2]
+def func_mul(reg, var):
+    print("MUL:", reg, "=", reg, "*", var)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] *= variables[var]
+        elif var.isdigit():
+            variables[reg] *= int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
-def func_mod(reg1, reg2):
-    print("MOD:", reg1, "=", reg1, "%", reg2)
-    variables[reg1] %= variables[reg2]
+def func_mod(reg, var):
+    if variables[var] == 0:
+        raise ZeroDivisionError("Modulo by zero")
+    print("MOD:", reg, "=", reg, "%", var)
+    if reg in list(variables)[0:3]:
+        if var in variables:
+            variables[reg] = variables[reg] % variables[var]
+        elif var.isdigit():
+            variables[reg] = variables[reg] % int(var)
+        else:
+            print(f"Error: {var} is not a valid register, variable, or constant")
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_inc(reg):
     print("INC:", reg, "=", reg, "+ 1")
-    variables[reg] += 1
+    if reg in list(variables)[0:3]:
+        variables[reg] += 1
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_dec(reg):
     print("DEC:", reg, "=", reg, "- 1")
-    variables[reg] -= 1
+    if reg in list(variables)[0:3]:
+        if variables[reg] == 0:
+            raise ValueError("Cannot decrement register that already contains zero")
+        else:
+            variables[reg] -= 1
+    else:
+        print("Error: Memory regions loads are NOT ALLOWED. (Only registers)")
 
 
 def func_beq(reg1, reg2, address):
-    if variables[reg1] == variables[reg2]:
-        func_jmp(address)
+    if reg1 & reg2 in variables:
+        if variables[reg1] == variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] == reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 == variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 == reg2:
+            func_jmp(address)
 
 
 def func_bne(reg1, reg2, address):
-    if variables[reg1] != variables[reg2]:
-        func_jmp(address)
+    if reg1 & reg2 in variables:
+        if variables[reg1] != variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] != reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 != variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 != reg2:
+            func_jmp(address)
+
 
 
 def func_bgg(reg1, reg2, address):
-    if variables[reg1] > variables[reg2]:
-        func_jmp(address)
+    if reg1 & reg2 in variables:
+        if variables[reg1] > variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] > reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 > variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 > reg2:
+            func_jmp(address)
 
 
 def func_bsm(reg1, reg2, address):
-    if variables[reg1] < variables[reg2]:
-        func_jmp(address)
+    if reg1 & reg2 in variables:
+        if variables[reg1] < variables[reg2]:
+            func_jmp(address)
+    elif reg1 in variables:
+        if variables[reg1] < reg2:
+            func_jmp(address)
+    elif reg2 in variables:
+        if reg1 < variables[reg2]:
+            func_jmp(address)
+    else:
+        if reg1 < reg2:
+            func_jmp(address)
 
 
 def func_jmp(address):
@@ -109,9 +240,19 @@ def func_jmp(address):
 
 
 def func_hlt():
-    print("HLT: end the program execution!\n")
+    print("HLT: end the program execution!")
     # stop execution
     pass
+
+
+def func_srl(reg, const):
+    print("SRL:", reg, "=", reg, ">>", const)
+    variables[reg] = variables[reg] // (2 ** int(const))
+
+
+def func_srr(reg, const):
+    print("SRR:", reg, "=", reg, "<<", const)
+    variables[reg] = variables[reg] * (2 ** int(const))
 
 
 filename = "example1.asm"
@@ -258,3 +399,5 @@ root = tk.Tk()
 root.geometry("400x400")
 app = App(root)
 root.mainloop()
+
+
