@@ -1,5 +1,7 @@
 import tkinter as tk
 
+import app as app
+
 
 def func_lda(x, y):
     print("LDA:", x, "<--", y)
@@ -200,6 +202,14 @@ for line in code_lines:
     args = parts[1:]
     # Execute the instruction with its arguments
     execute_instruction(instruction, args)
+    t0_label = tk.Label(text="T0 = " + str(variables["T0"]))
+    t0_label.pack()
+    t1_label = tk.Label(text="T1 = " + str(variables["T1"]))
+    t1_label.pack()
+    t2_label = tk.Label(text="T2 = " + str(variables["T2"]))
+    t2_label.pack()
+    t3_label = tk.Label(text="T3 = " + str(variables["T3"]))
+    t3_label.pack()
 
 print(variables)
 
@@ -248,5 +258,3 @@ root = tk.Tk()
 root.geometry("400x400")
 app = App(root)
 root.mainloop()
-
-
