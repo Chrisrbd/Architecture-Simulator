@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
+import os
 
 
 class ALU:
@@ -279,7 +280,7 @@ class Simulator:
         self.SP = 0  # Stack pointer initialized to 0
 
         self.variables = {"T0": 0, "T1": 0, "T2": 0, "T3": 0,
-                          "Stack": self.stack[self.SP]}  # Stack is the last element in the Stack
+                          "Stack": self.stack}  # Stack is the last element in the Stack
         self.alu = ALU(self.variables, self.SP)
         self.program_counter = ProgramCounter()
 
@@ -352,6 +353,7 @@ def gui():
     root = tk.Tk()
     root.title("Assembly Simulator")
 
+    filename = ""
     data_lines, code_lines = [], []
 
     instructions_frame = ttk.LabelFrame(root, text="Instruction")
@@ -366,7 +368,7 @@ def gui():
     stack_frame = ttk.LabelFrame(root, text="Stack")
     stack_frame.grid(row=1, column=1, padx=10, pady=10)
 
-    filename_label = ttk.Label(root, text="File name: None")
+    filename_label = ttk.Label(root, text="File name:")
     filename_label.grid(row=2, column=0, padx=10, pady=10)
 
     instructions_label = ttk.Label(root, text="Next instruction:")
@@ -387,7 +389,7 @@ def gui():
     stack_text = tk.Text(stack_frame, wrap=tk.WORD, height=10, width=30)
     stack_text.pack(padx=10, pady=10)
 
-    def update_text(line):
+    def update_text():
         # Clear the existing content of the Text widgets
         instructions_text.delete('1.0', tk.END)
         variables_text.delete('1.0', tk.END)
@@ -412,29 +414,37 @@ def gui():
             value = simulator.variables["Stack"]
             stack_text.insert(tk.END, f"{value} ")
 
+        # update filename
+        filename_label.configure(text="File name: " + filename)
+
         # update intruction
-        instructions_label.configure(text="Next instruction: " + code_lines[simulator.program_counter.pc])
+        if simulator.program_counter.pc != len(code_lines) - 1:
+            instructions_label.configure(text="Next instruction: " + code_lines[simulator.program_counter.pc])
+        else:
+            instructions_label.configure(text="Next instruction: Program completed")
 
     def load_file_button_click():
-        nonlocal data_lines, code_lines
+        nonlocal data_lines, code_lines, filename
         file_path = filedialog.askopenfilename(
             filetypes=[("Assembly files", "*.asm"), ("All files", "*.*")])
+        filename = os.path.basename(file_path)
 
         if file_path:
             simulator = Simulator()
             data_lines, code_lines = simulator.load_program(file_path)
-            update_text(code_lines[0])
+            update_text()
 
     def on_run_click():
         for i in code_lines:
             simulator.execute_program(data_lines, code_lines, i)
-            update_text(len(code_lines))
+            simulator.program_counter.pc = len(code_lines) - 1
+            update_text()
 
     def on_step_click():
         if simulator.program_counter.pc < len(code_lines):
             line = code_lines[simulator.program_counter.pc]
             simulator.execute_program(data_lines, code_lines, line)
-            update_text(simulator.program_counter.pc)
+            update_text()
             simulator.program_counter.next()
         else:
             print("Programme terminé")
