@@ -369,7 +369,7 @@ def gui():
     filename_label = ttk.Label(root, text="File name: None")
     filename_label.grid(row=2, column=0, padx=10, pady=10)
 
-    instructions_label = ttk.Label(root, text="Next instruction: None")
+    instructions_label = ttk.Label(root, text="Next instruction:")
     instructions_label.grid(row=3, column=0, padx=10, pady=10)
 
     instructions_text = tk.Text(instructions_frame, wrap=tk.WORD, height=10, width=30)
@@ -387,7 +387,7 @@ def gui():
     stack_text = tk.Text(stack_frame, wrap=tk.WORD, height=10, width=30)
     stack_text.pack(padx=10, pady=10)
 
-    def update_text():
+    def update_text(line):
         # Clear the existing content of the Text widgets
         instructions_text.delete('1.0', tk.END)
         variables_text.delete('1.0', tk.END)
@@ -412,6 +412,9 @@ def gui():
             value = simulator.variables["Stack"]
             stack_text.insert(tk.END, f"{value} ")
 
+        # update intruction
+        instructions_label.configure(text="Next instruction: " + code_lines[simulator.program_counter.pc])
+
     def load_file_button_click():
         nonlocal data_lines, code_lines
         file_path = filedialog.askopenfilename(
@@ -420,18 +423,18 @@ def gui():
         if file_path:
             simulator = Simulator()
             data_lines, code_lines = simulator.load_program(file_path)
-            update_text()
+            update_text(code_lines[0])
 
     def on_run_click():
         for i in code_lines:
             simulator.execute_program(data_lines, code_lines, i)
-            update_text()
+            update_text(len(code_lines))
 
     def on_step_click():
         if simulator.program_counter.pc < len(code_lines):
             line = code_lines[simulator.program_counter.pc]
             simulator.execute_program(data_lines, code_lines, line)
-            update_text()
+            update_text(simulator.program_counter.pc)
             simulator.program_counter.next()
         else:
             print("Programme terminé")
