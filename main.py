@@ -423,8 +423,9 @@ def gui():
             update_text()
 
     def on_run_click():
-        simulator.execute_program(data_lines, code_lines)
-        update_text()
+        for i in code_lines:
+            simulator.execute_program(data_lines, code_lines, i)
+            update_text()
 
     def on_step_click():
         if simulator.program_counter.pc < len(code_lines):
