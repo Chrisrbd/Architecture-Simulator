@@ -316,13 +316,13 @@ class Simulator:
 
         return data_lines, code_lines
 
-    def execute_program(self, data_lines, code_lines):
+    def execute_program(self, data_lines, code_lines, line):
         # Execute #DATA section
         print("\n#DATA section translated:")
         print(data_lines, "\n")
-        for line in data_lines:
+        for l in data_lines:
             # Split the line into variable name and initial value
-            parts = line.split()
+            parts = l.split()
             var_name = parts[0]
             var_value = int(parts[1])
 
@@ -335,18 +335,16 @@ class Simulator:
         print("\n#CODE section result:")
         print(code_lines, "\n")
         # Execute #CODE section
-        for line in code_lines:
-            # Separate the instruction from its arguments
-            parts = line.split(" ")
-            instruction = parts[0]
-            args = parts[1:]
-            # Look if operations are in the list of operations in ALU and execute the corresponding function
-            # 594
-            if instruction in self.alu.instructions.keys():
-                self.alu.instructions[instruction](*args)
-            else:
-                print("Error: Operation not found")
-            print(self.variables)
+        # Separate the instruction from its arguments
+        parts = line.split(" ")
+        instruction = parts[0]
+        args = parts[1:]
+        # Look if operations are in the list of operations in ALU and execute the corresponding function
+        if instruction in self.alu.instructions.keys():
+            self.alu.instructions[instruction](*args)
+        else:
+            print("Error: Operation not found")
+        print(self.variables)
 
 
 def gui():
@@ -429,7 +427,14 @@ def gui():
         update_text()
 
     def on_step_click():
-        print("on_step_click")
+        if simulator.program_counter.pc < len(code_lines):
+            line = code_lines[simulator.program_counter.pc]
+            simulator.execute_program(data_lines, code_lines, line)
+            update_text()
+            simulator.program_counter.next()
+        else:
+            print("Programme terminé")
+
 
     load_button = ttk.Button(root, text="Load File", command=load_file_button_click)
     load_button.grid(row=2, column=1, padx=10, pady=10)
@@ -443,4 +448,5 @@ def gui():
     root.mainloop()
 
 
-gui()
+if __name__ == "__main__":
+    gui()

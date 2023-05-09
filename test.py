@@ -279,7 +279,7 @@ class Simulator:
         self.SP = 0  # Stack pointer initialized to 0
 
         self.variables = {"T0": 0, "T1": 0, "T2": 0, "T3": 0,
-                          "Stack": self.stack[self.SP]}  # Stack is the last element in the Stack
+                          "Stack": self.stack}  # Stack is the last element in the Stack
         self.alu = ALU(self.variables, self.SP)
         self.program_counter = ProgramCounter()
 
@@ -389,6 +389,7 @@ def gui():
     stack_text = tk.Text(stack_frame, wrap=tk.WORD, height=10, width=30)
     stack_text.pack(padx=10, pady=10)
 
+
     def update_text():
         # Clear the existing content of the Text widgets
         instructions_text.delete('1.0', tk.END)
@@ -396,7 +397,7 @@ def gui():
         registers_text.delete('1.0', tk.END)
         stack_text.delete('1.0', tk.END)
 
-        # update instructions
+        # update code
         for i in code_lines:
             instructions_text.insert(tk.END, i + "\n")
 
@@ -411,8 +412,8 @@ def gui():
 
         # update stack
         for i in range(simulator.SP - 1, -1, -1):
-            value = simulator.variables["Stack"]
-            stack_text.insert(tk.END, f"{value} ")
+            value = simulator.variables["Stack"][i]
+            stack_text.insert(tk.END, f"{value}\n ")
 
     def load_file_button_click():
         nonlocal data_lines, code_lines
